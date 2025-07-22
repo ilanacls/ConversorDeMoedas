@@ -1,34 +1,97 @@
-import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.util.Scanner;
 
 public class Principal {
-  public static void main(String[] args) throws IOException, InterruptedException {
+  public static void main(String[] args) {
+    String menu = """
+        ********************************
+        
+        Seja bem-vindo/a ao Conversor de Moedas!
+        
+        1) Dólar ==> Peso chileno
+        2) Dólar ==> Peso argentino
+        3) Dólar ==> Boliviano
+        4) Dólar ==> Real brasileiro
+        5) Dólar ==> Peso Colombiano
+        6) Real brasileiro ==> Dólar
+        7) Sair
+        
+        ********************************
+        """;
 
-    String apiKey = "fa284044c2af07dbd6bbaf79";
-    var moedaBase = "USD";
-    var moedaAlvo = "BRL";
-    String endereco = "https://v6.exchangerate-api.com/v6/" + apiKey + "/pair/" + moedaBase + "/" + moedaAlvo;
+    Scanner leitura = new Scanner(System.in);
+    int opcaoMenu = 0;
 
-    HttpClient client = HttpClient.newHttpClient();
+    while (opcaoMenu != 7) {
+      System.out.println("\n" + menu);
+      System.out.println("Digite uma opção válida:");
+      opcaoMenu = leitura.nextInt();
+      selecionarOpcao(opcaoMenu, leitura);
 
-    HttpRequest request = HttpRequest.newBuilder()
-        .uri(URI.create(endereco))
-        .build();
+      if (opcaoMenu < 7 && !continuarConversao()) {
+        opcaoMenu = 7;
+        System.out.println("Obrigada por usar nosso Conversor de moedas, aplicação encerrada!");
+      }
+    }
+  }
 
-    HttpResponse<String> response = client
-        .send(request, HttpResponse.BodyHandlers.ofString());
+  public static boolean continuarConversao() {
+    Scanner leituraResposta = new Scanner(System.in);
+    System.out.println("\nDeseja continuar usando o Conversor de moedas? Digite 'sim' ou 'sair'");
+    String resposta = leituraResposta.nextLine();
 
-    String json = response.body();
-    System.out.println(json);
+    if(resposta.equalsIgnoreCase("sair")) {
+      return false;
+    }
 
-    Gson gson = new Gson();
-    MoedasExchange minhaMoeda = gson.fromJson(json, MoedasExchange.class);
-    System.out.println(minhaMoeda);
+    return true;
+  }
 
+  public static void executarConversao(String moedaOrigem, String moedaDestino, Scanner leitura) {
+    double valor = leitura.nextDouble();
+    String valorConvertido = ConversaoDeValor.converterMoeda(moedaOrigem, moedaDestino, valor);
+    System.out.println(valorConvertido);
+  }
+
+  public static void selecionarOpcao(int opcaoMenu, Scanner leitura) {
+
+    switch(opcaoMenu) {
+      case 1:
+        System.out.println("Digite o valor em Dólar: ");
+        executarConversao("USD", "CLP", leitura);
+        break;
+
+      case 2:
+        System.out.println("Digite o valor em Dólar: ");
+        executarConversao("USD", "ARS", leitura);
+        break;
+
+      case 3:
+        System.out.println("Digite o valor em Dólar: ");
+        executarConversao("USD", "BOB", leitura);
+        break;
+
+      case 4:
+        System.out.println("Digite o valor em Dólar: ");
+        executarConversao("USD", "BRL", leitura);
+        break;
+
+      case 5:
+        System.out.println("Digite o valor em Dólar: ");
+        executarConversao("USD", "COP", leitura);
+        break;
+
+      case 6:
+        System.out.println("Digite o valor em Real brasileiro: ");
+        executarConversao("BRL", "USD", leitura);
+        break;
+
+      case 7:
+        System.out.println("Obrigada por usar nosso Conversor de moedas, aplicação encerrada!");
+        break;
+
+      default:
+        System.out.println("Opção inválida, digite uma opção válida");
+        break;
+    }
   }
 }
